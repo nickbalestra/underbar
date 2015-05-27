@@ -393,7 +393,6 @@
         return item[functionOrKey].apply(item, args);
       }
     });
-
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -401,6 +400,23 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var sorted = _.map(collection, function(value) {
+        return {
+          value: value,
+          criteria: (typeof(iterator) === 'string') ? value[iterator] : iterator(value)
+        };
+      }).sort(function(left, right) {
+        var a = left.criteria;
+        var b = right.criteria;
+        if (a !== b) {
+          if (a > b || a === undefined) return 1;
+          if (a < b || b === undefined) return -1;
+        } else {
+          return 0;
+        }
+      });
+
+     return _.pluck(sorted, 'value');
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -409,6 +425,15 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var maxLength = _.sortBy(arguments, function(array){
+      return !array.length;
+    }).length;
+    var output = [];
+
+    for (var index = 0; index < maxLength; index++) {
+          output[index] = _.pluck(arguments, index);
+        }
+    return output;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -416,6 +441,7 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
