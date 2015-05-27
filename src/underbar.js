@@ -355,6 +355,22 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    // Implementation based on the Knuth Algorithm:
+    // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+    var clonedArary = array.slice();
+    var shuffled = [];
+    var randomIndex;
+    var temp;
+    var last;
+
+    for (last = clonedArary.length - 1; last >= 0; last--) {
+      temp = clonedArary[last];
+      randomIndex = Math.floor(Math.random() * (last));
+      clonedArary[last] = clonedArary[randomIndex];
+      clonedArary[randomIndex] = temp;
+      shuffled.push(clonedArary.pop());
+    }
+    return shuffled;
   };
 
 
