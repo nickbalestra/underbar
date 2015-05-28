@@ -357,20 +357,24 @@
   _.shuffle = function(array) {
     // Implementation based on the Knuth Algorithm:
     // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
-    var clonedArary = array.slice();
-    var shuffled = [];
-    var randomIndex;
-    var temp;
-    var last;
+    //var clonedArary = array.slice();
+    // var shuffled = [];
+    // var randomIndex;
+    // var temp;
+    // var last;
 
-    for (last = clonedArary.length - 1; last >= 0; last--) {
-      temp = clonedArary[last];
-      randomIndex = Math.floor(Math.random() * (last));
-      clonedArary[last] = clonedArary[randomIndex];
-      clonedArary[randomIndex] = temp;
-      shuffled.push(clonedArary.pop());
-    }
-    return shuffled;
+    // for (last = clonedArary.length - 1; last >= 0; last--) {
+    //   temp = clonedArary[last];
+    //   randomIndex = Math.floor(Math.random() * (last));
+    //   clonedArary[last] = clonedArary[randomIndex];
+    //   clonedArary[randomIndex] = temp;
+    //   shuffled.push(clonedArary.pop());
+    // }
+    // return shuffled;
+
+    // Simpler version using the native sort method :)
+    // where shuffle = randomly sorting
+    return array.slice().sort(function() {return 0.5 - Math.random()});
   };
 
 
@@ -385,7 +389,6 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
-
     return _.map(collection, function(item){
       if (typeof(functionOrKey) === "function") {
         return functionOrKey.apply(item, args);
@@ -400,23 +403,17 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
-    var sorted = _.map(collection, function(value) {
-        return {
-          value: value,
-          criteria: (typeof(iterator) === 'string') ? value[iterator] : iterator(value)
-        };
-      }).sort(function(left, right) {
-        var a = left.criteria;
-        var b = right.criteria;
-        if (a !== b) {
-          if (a > b || a === undefined) return 1;
-          if (a < b || b === undefined) return -1;
-        } else {
-          return 0;
-        }
-      });
-
-     return _.pluck(sorted, 'value');
+    return collection.sort(function(left, right){
+      if (typeof(iterator) === 'string') {
+        return (left[iterator] > right[iterator]) ? 1 : -1;
+      } else {
+        return (iterator(left) > iterator(right)) ? 1 : -1;
+      }
+    });
+    // TODO: Investigate why omitting to return 0 still
+    // pass the testes. Alternative solutions using map
+    // to decorate the collection with a creteria to be used to sort
+    // and then pluck back the decorated collection.
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -425,14 +422,10 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
-    var maxLength = _.sortBy(arguments, function(array){
-      return !array.length;
-    }).length;
     var output = [];
-
-    for (var index = 0; index < maxLength; index++) {
-          output[index] = _.pluck(arguments, index);
-        }
+    for (var index = 0; index < arguments.length; index++) {
+      output[index] = _.pluck(arguments, index);
+    }
     return output;
   };
 
@@ -441,17 +434,53 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var flat = [];
 
+    (function deepFlatten(nestedArray) {
+      for(var i = 0; i < nestedArray.length; i++) {
+        if(Array.isArray(nestedArray[i])) {
+          deepFlatten(nestedArray[i]);
+        } else {
+          flat.push(nestedArray[i]);
+        }
+      }
+    })(nestedArray);
+    return flat;
+    // TODO: explore a second alternative that doesn't rely on a closure
+    // but instead passes the result along each recursive call, as the function
+    // signature in the excercise seems to hint towards...
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    var commons = [];
+    var numArrays = arguments.length;
+    var firstArray = arguments[0];
+    for (var i = 0; i < firstArray.length; i++) {
+      var item = firstArray[i];
+      if (_.contains(commons, item)) {
+        continue;
+      }
+      for (var j = 1; j < numArrays; j++) {
+        if (!_.contains(arguments[j], item)) {
+          break;
+        }
+      }
+      if (j === numArrays) {
+        commons.push(item);
+      }
+    }
+    return commons;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var allTheRest = _.flatten(Array.prototype.slice.call(arguments, 1));
+    return _.filter(array, function(value){
+      return !_.contains(allTheRest, value);
+    });
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
@@ -460,5 +489,18 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+    var callable = true;
+    var result;
+
+    return function() {
+      if (callable) {
+        callable = false;
+        result = func.apply(this, arguments);
+        setTimeout(function(){
+          callable = true;
+        }, wait);
+      }
+      return result;
+    };
   };
 }());
