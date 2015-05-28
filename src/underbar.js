@@ -491,6 +491,7 @@
   _.throttle = function(func, wait) {
     var callable = true;
     var result;
+    // var queued = false;
 
     return function() {
       if (callable) {
@@ -498,8 +499,16 @@
         result = func.apply(this, arguments);
         setTimeout(function(){
           callable = true;
+          // if (queued) {
+          //   result = func.apply(this, arguments);
+          //   queued = false;
+          // }
+          // return result;
         }, wait);
       }
+      // else if (!queued){
+      //   queued = true;
+      // }
       return result;
     };
   };
