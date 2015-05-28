@@ -357,24 +357,24 @@
   _.shuffle = function(array) {
     // Implementation based on the Knuth Algorithm:
     // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
-    //var clonedArary = array.slice();
-    // var shuffled = [];
-    // var randomIndex;
-    // var temp;
-    // var last;
+    var clonedArary = array.slice();
+    var shuffled = [];
+    var randomIndex;
+    var temp;
+    var last;
 
-    // for (last = clonedArary.length - 1; last >= 0; last--) {
-    //   temp = clonedArary[last];
-    //   randomIndex = Math.floor(Math.random() * (last));
-    //   clonedArary[last] = clonedArary[randomIndex];
-    //   clonedArary[randomIndex] = temp;
-    //   shuffled.push(clonedArary.pop());
-    // }
-    // return shuffled;
+    for (last = clonedArary.length - 1; last >= 0; last--) {
+      temp = clonedArary[last];
+      randomIndex = Math.floor(Math.random() * (last));
+      clonedArary[last] = clonedArary[randomIndex];
+      clonedArary[randomIndex] = temp;
+      shuffled.push(clonedArary.pop());
+    }
+    return shuffled;
 
     // Simpler version using the native sort method :)
-    // where shuffle = randomly sorting
-    return array.slice().sort(function() {return 0.5 - Math.random()});
+    // where shuffle can be seen as "randomly sorting"
+    // return array.slice().sort(function() {return 0.5 - Math.random()});
   };
 
 
@@ -488,28 +488,47 @@
   // on this function.
   //
   // Note: This is difficult! It may take a while to implement.
-  _.throttle = function(func, wait) {
-    var callable = true;
-    var result;
-    // var queued = false;
+  // Simple implementation without scheduling
+  // _.throttle = function(func, wait) {
+  //   var callable = true;
+  //   var result;
 
-    return function() {
-      if (callable) {
-        callable = false;
-        result = func.apply(this, arguments);
-        setTimeout(function(){
-          callable = true;
-          // if (queued) {
-          //   result = func.apply(this, arguments);
-          //   queued = false;
-          // }
-          // return result;
+  //   return function() {
+  //     if (callable) {
+  //       callable = false;
+  //       result = func.apply(this, arguments);
+  //       setTimeout(function(){
+  //         callable = true;
+  //       }, wait);
+  //     }
+  //     return result;
+  //   };
+  // };
+
+  // Timer based implementation allowing for scheduling
+  _.throttle = function(func, wait) {
+    var lastTrigger;
+    var timer;
+    var results;
+
+    return function () {
+      // For Date.now() details: https://goo.gl/iYn3fA
+      // For better compatibility use new Date().getTime();
+      var now = Date.now();
+
+      if (lastTrigger && now < lastTrigger + wait) {
+
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          lastTrigger = now;
+          results = func.apply(this, arguments);
         }, wait);
+
+      } else {
+        lastTrigger = now;
+        results =func.apply(this, arguments);
       }
-      // else if (!queued){
-      //   queued = true;
-      // }
-      return result;
     };
   };
 }());
+
