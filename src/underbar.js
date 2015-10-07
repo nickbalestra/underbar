@@ -248,7 +248,7 @@
    * FUNCTIONS
    * =========
    *
-   * Now we're getting into function decorators, which take in any function
+   * Function decorators, which take in any function
    * and return out a new version of the function that works somewhat differently
    */
 
