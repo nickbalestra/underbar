@@ -199,7 +199,7 @@
    * OBJECTS
    * =======
    *
-   * In this section, we'll look at a couple of helpers for merging objects.
+   * Helpers for merging objects.
    */
 
   // Extend a given object with all the properties of the passed in
