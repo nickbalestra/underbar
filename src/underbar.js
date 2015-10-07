@@ -255,28 +255,21 @@
   // Return a function that can be called at most one time. Subsequent calls
   // should return the previously returned value.
   _.once = function(func) {
-    // TIP: These variables are stored in a "closure scope" (worth researching),
-    // so that they'll remain available to the newly-generated function every
-    // time it's called.
     var alreadyCalled = false;
     var result;
 
-    // TIP: We'll return a new function that delegates to the old one, but only
-    // if it hasn't been called before.
     return function() {
       if (!alreadyCalled) {
-        // TIP: .apply(this, arguments) is the standard way to pass on all of the
-        // infromation from one function call to another.
         result = func.apply(this, arguments);
         alreadyCalled = true;
       }
-      // The new function always returns the originally computed result.
+
       return result;
     };
   };
 
-  // Memorize an expensive function's results by storing them. You may assume
-  // that the function takes only one argument and that it is a primitive.
+  // Memorize an expensive function's results by storing them. In our implementation
+  // you may assume that the function takes only one argument and that it is a primitive.
   // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
   // same thing as once, but based on many sets of unique arguments.
   //
@@ -317,10 +310,6 @@
    */
 
   // Randomizes the order of an array's contents.
-  //
-  // TIP: This function's test suite will ask that you not modify the original
-  // input array. For a tip on how to make a copy of an array, see:
-  // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
     // Implementation based on the Knuth Algorithm:
     // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
@@ -339,22 +328,18 @@
     }
     return shuffled;
 
-    // Simpler version using the native sort method :)
+    // Simpler version using the native sort method
     // where shuffle can be seen as "randomly sorting"
     // return array.slice().sort(function() {return 0.5 - Math.random()});
   };
 
 
   /**
-   * EXTRA CREDIT
-   * =================
-   *
-   * Note: This is the end of the pre-course curriculum. Feel free to continue,
-   * but nothing beyond here is required.
+   * EXTRA 
+   * ======
    */
 
   // Calls the method named by functionOrKey on each value in the list.
-  // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
     return _.map(collection, function(item){
       if (typeof(functionOrKey) === "function") {
@@ -377,10 +362,6 @@
         return (iterator(left) > iterator(right)) ? 1 : -1;
       }
     });
-    // TODO: Investigate why omitting to return 0 still
-    // pass the testes. Alternative solutions using map
-    // to decorate the collection with a creteria to be used to sort
-    // and then pluck back the decorated collection.
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -398,8 +379,6 @@
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
-  //
-  // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
     var flat = [];
 
@@ -454,7 +433,6 @@
   // during a given window of time.  See the Underbar readme for extra details
   // on this function.
   //
-  // Note: This is difficult! It may take a while to implement.
   // Simple implementation without scheduling
   // _.throttle = function(func, wait) {
   //   var callable = true;
